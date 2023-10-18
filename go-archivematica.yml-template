@@ -1,0 +1,4 @@
+prod:
+  url: http://127.0.0.
+  username: archivematica
+  apikey: your api key UUID
