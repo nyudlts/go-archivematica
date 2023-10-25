@@ -11,12 +11,12 @@ import (
 func (a *AMClient) GetIngestStatus(id string) (IngestStatus, error) {
 	ingestStatus := IngestStatus{}
 	endpoint := fmt.Sprintf("/api/ingest/status/%s", id)
-	url := fmt.Sprintf("%s%s", a.Host, endpoint)
+	url := fmt.Sprintf("%s%s", a.AMHost, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return ingestStatus, err
 	}
-	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.APIKey)
+	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.AMAPIKey)
 	get.Header.Add("Authorization", auth)
 
 	response, err := a.Client.Do(get)
@@ -39,12 +39,12 @@ func (a *AMClient) GetIngestStatus(id string) (IngestStatus, error) {
 func (a *AMClient) GetCompletedIngests() (UUIDList, error) {
 	completedTransfers := UUIDList{}
 	endpoint := "/api/ingest/completed"
-	url := fmt.Sprintf("%s%s", a.Host, endpoint)
+	url := fmt.Sprintf("%s%s", a.AMHost, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return completedTransfers, err
 	}
-	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.APIKey)
+	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.AMAPIKey)
 	get.Header.Add("Authorization", auth)
 
 	response, err := a.Client.Do(get)
@@ -67,12 +67,12 @@ func (a *AMClient) GetCompletedIngests() (UUIDList, error) {
 func (a *AMClient) GetWaitingIngests() (WaitingIngests, error) {
 	waitingIngests := WaitingIngests{}
 	endpoint := "/api/ingest/waiting"
-	url := fmt.Sprintf("%s%s", a.Host, endpoint)
+	url := fmt.Sprintf("%s%s", a.AMHost, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return waitingIngests, err
 	}
-	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.APIKey)
+	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.AMAPIKey)
 	get.Header.Add("Authorization", auth)
 
 	response, err := a.Client.Do(get)
@@ -97,12 +97,12 @@ func (a *AMClient) GetWaitingIngests() (WaitingIngests, error) {
 func (a *AMClient) GetTransferStatus(id string) (TransferStatus, error) {
 	transferStatus := TransferStatus{}
 	endpoint := fmt.Sprintf("/api/transfer/status/%s", id)
-	url := fmt.Sprintf("%s%s", a.Host, endpoint)
+	url := fmt.Sprintf("%s%s", a.AMHost, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return transferStatus, err
 	}
-	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.APIKey)
+	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.AMAPIKey)
 	get.Header.Add("Authorization", auth)
 
 	response, err := a.Client.Do(get)
@@ -125,12 +125,12 @@ func (a *AMClient) GetTransferStatus(id string) (TransferStatus, error) {
 func (a *AMClient) GetCompletedTransfers() (UUIDList, error) {
 	completedTransfers := UUIDList{}
 	endpoint := "/api/transfer/completed"
-	url := fmt.Sprintf("%s%s", a.Host, endpoint)
+	url := fmt.Sprintf("%s%s", a.AMHost, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return completedTransfers, err
 	}
-	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.APIKey)
+	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.AMAPIKey)
 	get.Header.Add("Authorization", auth)
 
 	response, err := a.Client.Do(get)
@@ -153,12 +153,12 @@ func (a *AMClient) GetCompletedTransfers() (UUIDList, error) {
 func (a *AMClient) GetUnapprovedTransfers() (UnapprovedTransfers, error) {
 	unapprovedTransfers := UnapprovedTransfers{}
 	endpoint := "/api/transfer/unapproved"
-	url := fmt.Sprintf("%s%s", a.Host, endpoint)
+	url := fmt.Sprintf("%s%s", a.AMHost, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return unapprovedTransfers, err
 	}
-	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.APIKey)
+	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.AMAPIKey)
 	get.Header.Add("Authorization", auth)
 
 	response, err := a.Client.Do(get)

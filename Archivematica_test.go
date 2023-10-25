@@ -10,7 +10,7 @@ func TestArchivematicaEndpoints(t *testing.T) {
 
 	t.Run("get am client", func(t *testing.T) {
 		var err error
-		amClient, err = NewAMClient("go-archivematica.yml", "am", 20)
+		amClient, err = NewAMClient("go-archivematica.yml", 20)
 		if err != nil {
 			t.Error(err)
 		}

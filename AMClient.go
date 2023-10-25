@@ -1,7 +1,6 @@
 package go_am
 
 import (
-	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -11,18 +10,22 @@ import (
 
 type AMClient struct {
 	Username string
-	Host     string
-	APIKey   string
+	AMHost   string
+	AMAPIKey string
+	SSHost   string
+	SSAPIKey string
 	Client   *http.Client
 }
 
 type AMEnvironment struct {
-	URL      string `yaml:"url"`
+	AMURL    string `yaml:"am_url"`
+	SSURL    string `yaml:"ss_url"`
 	Username string `yaml:"username"`
-	APIKey   string `yaml:"apikey"`
+	AMAPIKey string `yaml:"am_api_key"`
+	SSAPIKey string `yaml:"ss_api_key"`
 }
 
-func NewAMClient(config string, env string, timeout int) (*AMClient, error) {
+func NewAMClient(config string, timeout int) (*AMClient, error) {
 	transport := &http.Transport{
 		MaxIdleConns:       10,
 		IdleConnTimeout:    time.Duration(timeout) * time.Second,
@@ -38,20 +41,10 @@ func NewAMClient(config string, env string, timeout int) (*AMClient, error) {
 		return nil, err
 	}
 
-	envMap := map[string]AMEnvironment{}
-
-	if err := yaml.Unmarshal(configBytes, &envMap); err != nil {
+	var amEnv AMEnvironment
+	if err := yaml.Unmarshal(configBytes, &amEnv); err != nil {
 		return nil, err
 	}
 
-	var amEnv AMEnvironment
-	for k, v := range envMap {
-		if k == env {
-			amEnv = v
-			break
-		}
-		return nil, fmt.Errorf("environemnt %s does not exist", env)
-	}
-
-	return &AMClient{amEnv.Username, amEnv.URL, amEnv.APIKey, nclient}, nil
+	return &AMClient{amEnv.Username, amEnv.AMURL, amEnv.SSURL, amEnv.AMAPIKey, amEnv.SSAPIKey, nclient}, nil
 }

@@ -8,7 +8,7 @@ func TestStorageServiceEndpoints(t *testing.T) {
 	var ssClient *AMClient
 	t.Run("get am client", func(t *testing.T) {
 		var err error
-		ssClient, err = NewAMClient("go-archivematica-ss.yml", "ss", 20)
+		ssClient, err = NewAMClient("go-archivematica-ss.yml", 20)
 		if err != nil {
 			t.Error(err)
 		}

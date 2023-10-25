@@ -1,4 +1,0 @@
-ss:
-  url: http://127.0.0.1:8000
-  username: archivematica
-  apikey: your storage service api key UUID

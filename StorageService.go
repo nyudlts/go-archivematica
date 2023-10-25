@@ -12,13 +12,13 @@ func (a *AMClient) GetPipeline(pipelineId string) (*Pipeline, error) {
 	var pipeline Pipeline
 
 	endpoint := fmt.Sprintf("/api/v2/pipeline/%s", pipelineId)
-	url := fmt.Sprintf("%s%s", a.Host, endpoint)
+	url := fmt.Sprintf("%s%s", a.SSHost, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return &pipeline, err
 	}
 
-	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.APIKey)
+	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.SSAPIKey)
 	get.Header.Add("Authorization", auth)
 
 	response, err := a.Client.Do(get)
@@ -42,12 +42,12 @@ func (a *AMClient) GetPipeline(pipelineId string) (*Pipeline, error) {
 func (a *AMClient) GetPipelines() (*Pipelines, error) {
 	var pipelines Pipelines
 	endpoint := "/api/v2/pipeline?description__startswith=Archivematica"
-	url := fmt.Sprintf("%s%s", a.Host, endpoint)
+	url := fmt.Sprintf("%s%s", a.SSHost, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return &pipelines, err
 	}
-	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.APIKey)
+	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.SSAPIKey)
 	get.Header.Add("Authorization", auth)
 
 	response, err := a.Client.Do(get)
@@ -71,12 +71,12 @@ func (a *AMClient) GetPipelines() (*Pipelines, error) {
 func (a *AMClient) GetSpace(spaceUUID string) (*Space, error) {
 	var space Space
 	endpoint := fmt.Sprintf("/api/v2/space/%s/", spaceUUID)
-	url := fmt.Sprintf("%s%s", a.Host, endpoint)
+	url := fmt.Sprintf("%s%s", a.SSHost, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return &space, err
 	}
-	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.APIKey)
+	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.SSAPIKey)
 	get.Header.Add("Authorization", auth)
 
 	response, err := a.Client.Do(get)
@@ -100,12 +100,12 @@ func (a *AMClient) GetSpace(spaceUUID string) (*Space, error) {
 func (a *AMClient) GetSpaces() (*Spaces, error) {
 	var spaces Spaces
 	endpoint := "/api/v2/space"
-	url := fmt.Sprintf("%s%s", a.Host, endpoint)
+	url := fmt.Sprintf("%s%s", a.SSHost, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return &spaces, err
 	}
-	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.APIKey)
+	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.SSAPIKey)
 	get.Header.Add("Authorization", auth)
 
 	response, err := a.Client.Do(get)
@@ -129,12 +129,12 @@ func (a *AMClient) GetSpaces() (*Spaces, error) {
 func (a *AMClient) GetLocations() (*Locations, error) {
 	var locations Locations
 	endpoint := "/api/v2/location"
-	url := fmt.Sprintf("%s%s", a.Host, endpoint)
+	url := fmt.Sprintf("%s%s", a.SSHost, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return &locations, err
 	}
-	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.APIKey)
+	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.SSAPIKey)
 	get.Header.Add("Authorization", auth)
 
 	response, err := a.Client.Do(get)
@@ -158,12 +158,12 @@ func (a *AMClient) GetLocations() (*Locations, error) {
 func (a *AMClient) GetLocation(locationUUID string) (*Location, error) {
 	var location Location
 	endpoint := fmt.Sprintf("/api/v2/location/%s/", locationUUID)
-	url := fmt.Sprintf("%s%s", a.Host, endpoint)
+	url := fmt.Sprintf("%s%s", a.SSHost, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return &location, err
 	}
-	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.APIKey)
+	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.SSAPIKey)
 	get.Header.Add("Authorization", auth)
 
 	response, err := a.Client.Do(get)
@@ -186,12 +186,12 @@ func (a *AMClient) GetLocation(locationUUID string) (*Location, error) {
 func (a *AMClient) BrowseLocation(locationUUID string) (*LocationBrowser, error) {
 	var locationBrowser LocationBrowser
 	endpoint := fmt.Sprintf("/api/v2/location/%s/browse", locationUUID)
-	url := fmt.Sprintf("%s%s", a.Host, endpoint)
+	url := fmt.Sprintf("%s%s", a.SSHost, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return &locationBrowser, err
 	}
-	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.APIKey)
+	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.SSAPIKey)
 	get.Header.Add("Authorization", auth)
 
 	response, err := a.Client.Do(get)
