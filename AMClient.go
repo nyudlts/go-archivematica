@@ -1,6 +1,7 @@
 package go_am
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -15,6 +16,10 @@ type AMClient struct {
 	SSHost   string
 	SSAPIKey string
 	Client   *http.Client
+}
+
+func (a *AMClient) String() string {
+	return fmt.Sprintf("Username\t%s\nAMHost\t%s", a.Username, a.AMHost)
 }
 
 type AMEnvironment struct {

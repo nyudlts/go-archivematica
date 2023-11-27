@@ -8,7 +8,7 @@ func TestAMClient(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		t.Logf("%v", amClient)
+		t.Logf("%s", amClient)
 
 	})
 }

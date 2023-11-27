@@ -1,6 +1,5 @@
-prod:
-  am_url: http://127.0.0.1
-  ss_url: http://127.0.0.1
-  username: archivematica
-  am_api_key: your archivematica api key UUID
-  ss_api_key: your storage service api key UUID
+am_url: http://127.0.0.1
+ss_url: http://127.0.0.1
+username: archivematica
+am_api_key: your archivematica api key UUID
+ss_api_key: your storage service api key UUID
