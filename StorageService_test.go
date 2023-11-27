@@ -5,14 +5,13 @@ import (
 )
 
 func TestStorageServiceEndpoints(t *testing.T) {
-	var ssClient *AMClient
-	t.Run("get am client", func(t *testing.T) {
-		var err error
-		ssClient, err = NewAMClient("go-archivematica.yml", 20)
-		if err != nil {
-			t.Error(err)
-		}
-	})
+
+	ssClient, err := NewAMClient(config, 20)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log(ssClient)
 
 	var pipelineUUID string
 	t.Run("get pipelines", func(t *testing.T) {
@@ -27,7 +26,7 @@ func TestStorageServiceEndpoints(t *testing.T) {
 		}
 	})
 
-	t.Run("Get a pipeline", func(t *testing.T) {
+	t.Run("get a pipeline", func(t *testing.T) {
 		pipeline, err := ssClient.GetPipeline(pipelineUUID)
 		if err != nil {
 			t.Error(err)
@@ -66,11 +65,11 @@ func TestStorageServiceEndpoints(t *testing.T) {
 		}
 		if len(locations.Objects) > 0 {
 			locationUUID = locations.Objects[0].UUID.String()
+			t.Log(locations.Objects[0].Description)
 		} else {
 			t.Error("No locations returned")
 		}
 	})
-
 	t.Run("get location", func(t *testing.T) {
 		location, err := ssClient.GetLocation(locationUUID)
 		if err != nil {
@@ -86,5 +85,14 @@ func TestStorageServiceEndpoints(t *testing.T) {
 			t.Error(err)
 		}
 		t.Logf("%v\n", locationBrowser)
+	})
+
+	t.Run("get a location by name", func(t *testing.T) {
+		locationName := "staging ingest"
+		location, err := ssClient.GetLocationByName(locationName)
+		if err != nil {
+			t.Error(err)
+		}
+		t.Logf("%v\n", location)
 	})
 }

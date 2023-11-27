@@ -1,10 +1,14 @@
 package go_am
 
-import "testing"
+import (
+	"flag"
+	"testing"
+)
 
 func TestAMClient(t *testing.T) {
+	flag.Parse()
 	t.Run("Test AMClient Creation", func(t *testing.T) {
-		amClient, err := NewAMClient("go-archivematica.yml", 20)
+		amClient, err := NewAMClient(config, 20)
 		if err != nil {
 			t.Error(err)
 		}

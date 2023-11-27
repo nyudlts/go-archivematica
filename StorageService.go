@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -43,6 +44,7 @@ func (a *AMClient) GetPipelines() (*Pipelines, error) {
 	var pipelines Pipelines
 	endpoint := "/api/v2/pipeline?description__startswith=Archivematica"
 	url := fmt.Sprintf("%s%s", a.SSHost, endpoint)
+	log.Printf("%s", url)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return &pipelines, err
@@ -183,6 +185,23 @@ func (a *AMClient) GetLocation(locationUUID string) (*Location, error) {
 	return &location, nil
 }
 
+// get a location by name
+func (a *AMClient) GetLocationByName(locationName string) (Location, error) {
+	locations, err := a.GetLocations()
+	if err != nil {
+		return Location{}, err
+	}
+
+	for _, location := range locations.Objects {
+		if location.Description == locationName {
+			return location, nil
+		}
+	}
+
+	return Location{}, fmt.Errorf("no location found for `%s`", locationName)
+}
+
+// browse a location
 func (a *AMClient) BrowseLocation(locationUUID string) (*LocationBrowser, error) {
 	var locationBrowser LocationBrowser
 	endpoint := fmt.Sprintf("/api/v2/location/%s/browse", locationUUID)

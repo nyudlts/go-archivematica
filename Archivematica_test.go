@@ -8,13 +8,10 @@ func TestArchivematicaEndpoints(t *testing.T) {
 	var amClient *AMClient
 	var completedIngestId string
 
-	t.Run("get am client", func(t *testing.T) {
-		var err error
-		amClient, err = NewAMClient("go-archivematica.yml", 20)
-		if err != nil {
-			t.Error(err)
-		}
-	})
+	amClient, err := NewAMClient(config, 20)
+	if err != nil {
+		t.Fatal(err.Error())
+	}
 
 	t.Run("Test Get Completed Ingests", func(t *testing.T) {
 		completedIngests, err := amClient.GetCompletedIngests()

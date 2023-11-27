@@ -19,7 +19,7 @@ type AMClient struct {
 }
 
 func (a *AMClient) String() string {
-	return fmt.Sprintf("Username\t%s\nAMHost\t%s", a.Username, a.AMHost)
+	return fmt.Sprintf("\nUsername\t%s\nAMHost\t\t%s\nSSHost\t\t%s", a.Username, a.AMHost, a.SSHost)
 }
 
 type AMEnvironment struct {
@@ -51,5 +51,5 @@ func NewAMClient(config string, timeout int) (*AMClient, error) {
 		return nil, err
 	}
 
-	return &AMClient{amEnv.Username, amEnv.AMURL, amEnv.SSURL, amEnv.AMAPIKey, amEnv.SSAPIKey, nclient}, nil
+	return &AMClient{Username: amEnv.Username, AMHost: amEnv.AMURL, SSHost: amEnv.SSURL, AMAPIKey: amEnv.AMAPIKey, SSAPIKey: amEnv.SSAPIKey, Client: nclient}, nil
 }
