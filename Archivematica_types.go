@@ -76,9 +76,9 @@ func (u UnapprovedTransfer) String() string {
 }
 
 func (is IngestStatus) String() string {
-	out := fmt.Sprintf("Message: %s\n", is.Message)
-	out = out + "Transfer Status:\n"
-	out = out + fmt.Sprintf("\tname: %s\n", is.Name)
+	//out := fmt.Sprintf("Message: %s\n", is.Message)
+	//out = out + "Transfer Status:\n"
+	out := fmt.Sprintf("\tname: %s\n", is.Name)
 	out = out + fmt.Sprintf("\tmicroservice: %s\n", is.Microservice)
 	out = out + fmt.Sprintf("\tdirectory: %s\n", is.Directory)
 	out = out + fmt.Sprintf("\tpath: %s\n", is.Path)
@@ -88,9 +88,9 @@ func (is IngestStatus) String() string {
 }
 
 func (ts TransferStatus) String() string {
-	out := fmt.Sprintf("Message: %s\n", ts.Message)
-	out = out + "Transfer Status:\n"
-	out = out + fmt.Sprintf("\tname: %s\n", ts.Name)
+	//out := fmt.Sprintf("Message: %s\n", ts.Message)
+	//out = out + "Transfer Status:\n"
+	out := fmt.Sprintf("\tname: %s\n", ts.Name)
 	out = out + fmt.Sprintf("\tsip_uuid: %s\n", ts.SIPUUID)
 	out = out + fmt.Sprintf("\tmicroservice: %s\n", ts.Microservice)
 	out = out + fmt.Sprintf("\tdirectory: %s\n", ts.Directory)

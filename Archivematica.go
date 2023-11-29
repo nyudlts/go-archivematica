@@ -12,7 +12,9 @@ import (
 	"github.com/google/uuid"
 )
 
-// Ingest Functions
+//* Ingest Functions *//
+
+// Get The status of an ingest
 func (a *AMClient) GetIngestStatus(id string) (IngestStatus, error) {
 	ingestStatus := IngestStatus{}
 	endpoint := fmt.Sprintf("/api/ingest/status/%s", id)
@@ -41,34 +43,36 @@ func (a *AMClient) GetIngestStatus(id string) (IngestStatus, error) {
 	return ingestStatus, nil
 }
 
+// Get UUID List of completed ingests
 func (a *AMClient) GetCompletedIngests() (UUIDList, error) {
-	completedTransfers := UUIDList{}
+	completedIngests := UUIDList{}
 	endpoint := "/api/ingest/completed"
 	url := fmt.Sprintf("%s%s", a.AMHost, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return completedTransfers, err
+		return completedIngests, err
 	}
 	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.AMAPIKey)
 	get.Header.Add("Authorization", auth)
 
 	response, err := a.Client.Do(get)
 	if err != nil {
-		return completedTransfers, err
+		return completedIngests, err
 	}
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
-		return completedTransfers, err
+		return completedIngests, err
 	}
 
-	if err := json.Unmarshal(body, &completedTransfers); err != nil {
-		return completedTransfers, err
+	if err := json.Unmarshal(body, &completedIngests); err != nil {
+		return completedIngests, err
 	}
 
-	return completedTransfers, nil
+	return completedIngests, nil
 }
 
+// Get Waiting ingests
 func (a *AMClient) GetWaitingIngests() (WaitingIngests, error) {
 	waitingIngests := WaitingIngests{}
 	endpoint := "/api/ingest/waiting"
@@ -98,7 +102,7 @@ func (a *AMClient) GetWaitingIngests() (WaitingIngests, error) {
 
 }
 
-// Transfer Functions
+//* Transfer Functions *//
 
 // Start a new transfer
 func (a *AMClient) StartTransfer(location uuid.UUID, path string) error {
@@ -202,6 +206,7 @@ func (a *AMClient) GetTransferStatus(id string) (TransferStatus, error) {
 	return transferStatus, nil
 }
 
+// Get completed ingests
 func (a *AMClient) GetCompletedTransfers() (UUIDList, error) {
 	completedTransfers := UUIDList{}
 	endpoint := "/api/transfer/completed"
@@ -230,6 +235,7 @@ func (a *AMClient) GetCompletedTransfers() (UUIDList, error) {
 	return completedTransfers, nil
 }
 
+// Get Transfers waiting approval
 func (a *AMClient) GetUnapprovedTransfers() (UnapprovedTransfers, error) {
 	unapprovedTransfers := UnapprovedTransfers{}
 	endpoint := "/api/transfer/unapproved"
@@ -256,4 +262,77 @@ func (a *AMClient) GetUnapprovedTransfers() (UnapprovedTransfers, error) {
 	}
 
 	return unapprovedTransfers, nil
+}
+
+// Delete a transfer
+func (a *AMClient) DeleteTransfer(id uuid.UUID) error {
+
+	endpoint := fmt.Sprintf("/api/transfer/unapproved/%s", id)
+	reqUrl := fmt.Sprintf("%s%s", a.AMHost, endpoint)
+
+	req, err := http.NewRequest("DELETE", reqUrl, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", fmt.Sprintf("ApiKey archivematica:%s", a.AMAPIKey))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(body))
+	return nil
+}
+
+// Monitor
+func (a *AMClient) Monitor() {
+	fmt.Println("++ Archivematica Monitor ++")
+	unapprovedTransfers, err := a.GetUnapprovedTransfers()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("\n== Unapproved Transfers ==")
+	for _, unapprovedTransfer := range unapprovedTransfers.Results {
+		xfrmd, err := a.GetTransferStatus(unapprovedTransfer.UUID.String())
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(xfrmd)
+	}
+
+	completedTransfers, err := a.GetCompletedTransfers()
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println("\n== Completed Transfers ==")
+	for _, completedTransfer := range completedTransfers.Results {
+		xfrmd, err := a.GetTransferStatus(completedTransfer)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(xfrmd)
+	}
+
+	completedIngests, err := a.GetCompletedIngests()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("\n== Completed Ingests ==")
+	for _, completedIngest := range completedIngests.Results {
+		igmd, err := a.GetIngestStatus(completedIngest)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(igmd)
+	}
+	fmt.Println()
 }
