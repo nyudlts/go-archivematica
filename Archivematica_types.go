@@ -67,6 +67,14 @@ func (u UUIDList) String() string {
 	return f
 }
 
+func (w WaitingIngest) String() string {
+	return fmt.Sprintf("Microservice: %s, SIPName: %s, SIPDir: %s, UUID: %s", w.Microservice, w.SIPName, w.SIPDirectory, w.SIPUUID)
+}
+
+func (u UnapprovedTransfer) String() string {
+	return fmt.Sprintf("Directory: %s, Type: %s, UUID: %s", u.Directory, u.Type, u.UUID)
+}
+
 func (is IngestStatus) String() string {
 	out := fmt.Sprintf("Message: %s\n", is.Message)
 	out = out + "Transfer Status:\n"

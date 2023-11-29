@@ -1,10 +1,15 @@
 package go_am
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
+	"strings"
+
+	"github.com/google/uuid"
 )
 
 // Ingest Functions
@@ -94,6 +99,81 @@ func (a *AMClient) GetWaitingIngests() (WaitingIngests, error) {
 }
 
 // Transfer Functions
+
+// Start a new transfer
+func (a *AMClient) StartTransfer(location uuid.UUID, path string) error {
+
+	//encode the uuid and the path to base64
+	pathValue := fmt.Sprintf("%s:%s", location.String(), path)
+	encodedValue := base64.RawStdEncoding.EncodeToString([]byte(pathValue))
+
+	//encode the params
+	params := url.Values{}
+	params.Add("name", path)
+	params.Add("type", `standard`)
+	params.Add("paths[]", fmt.Sprintf(`%s==`, encodedValue))
+	body := strings.NewReader(params.Encode())
+
+	//construct the uri and the post
+	endpoint := "/api/transfer/start_transfer/"
+	am_url := fmt.Sprintf("%s%s", a.AMHost, endpoint)
+	req, err := http.NewRequest("POST", am_url, body)
+	if err != nil {
+		return err
+	}
+
+	//set the header parameters
+	req.Header.Set("Authorization", fmt.Sprintf("ApiKey archivematica:%s", a.AMAPIKey))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	//execute the post
+	resp, err := a.Client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	//print the response body
+	b, _ := io.ReadAll(resp.Body)
+	fmt.Println(string(b))
+
+	return nil
+}
+
+// Approve a transfer
+func (a *AMClient) ApproveTransfer(directory string, xtype string) error {
+	params := url.Values{}
+	params.Add("directory", directory)
+	params.Add("type", xtype)
+	params.Add("rows_id[]", ``)
+	body := strings.NewReader(params.Encode())
+
+	endpoint := "/api/transfer/approve/"
+	am_url := fmt.Sprintf("%s%s", a.AMHost, endpoint)
+	req, err := http.NewRequest("POST", am_url, body)
+	if err != nil {
+		return err
+	}
+
+	//set the header parameters
+	req.Header.Set("Authorization", fmt.Sprintf("ApiKey archivematica:%s", a.AMAPIKey))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	//execute the request
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	// print the response body
+	b, _ := io.ReadAll(resp.Body)
+	fmt.Println(string(b))
+
+	return nil
+}
+
+// Get the status of a transfer
 func (a *AMClient) GetTransferStatus(id string) (TransferStatus, error) {
 	transferStatus := TransferStatus{}
 	endpoint := fmt.Sprintf("/api/transfer/status/%s", id)
