@@ -105,7 +105,7 @@ func (a *AMClient) GetWaitingIngests() (WaitingIngests, error) {
 //* Transfer Functions *//
 
 // Start a new transfer
-func (a *AMClient) StartTransfer(location uuid.UUID, path string) error {
+func (a *AMClient) StartTransfer(location uuid.UUID, path string) (StartTransferResponse, error) {
 
 	//encode the uuid and the path to base64
 	pathValue := fmt.Sprintf("%s:%s", location.String(), path)
@@ -123,7 +123,7 @@ func (a *AMClient) StartTransfer(location uuid.UUID, path string) error {
 	am_url := fmt.Sprintf("%s%s", a.AMHost, endpoint)
 	req, err := http.NewRequest("POST", am_url, body)
 	if err != nil {
-		return err
+		return StartTransferResponse{}, err
 	}
 
 	//set the header parameters
@@ -133,15 +133,18 @@ func (a *AMClient) StartTransfer(location uuid.UUID, path string) error {
 	//execute the post
 	resp, err := a.Client.Do(req)
 	if err != nil {
-		return err
+		return StartTransferResponse{}, err
 	}
 	defer resp.Body.Close()
 
 	//print the response body
 	b, _ := io.ReadAll(resp.Body)
-	fmt.Println(string(b))
+	startTransferResponse := StartTransferResponse{}
+	if err := json.Unmarshal(b, &startTransferResponse); err != nil {
+		return StartTransferResponse{}, err
+	}
 
-	return nil
+	return startTransferResponse, nil
 }
 
 // Approve a transfer
@@ -206,7 +209,7 @@ func (a *AMClient) GetTransferStatus(id string) (TransferStatus, error) {
 	return transferStatus, nil
 }
 
-// Get completed ingests
+// Get completed Transfers
 func (a *AMClient) GetCompletedTransfers() (UUIDList, error) {
 	completedTransfers := UUIDList{}
 	endpoint := "/api/transfer/completed"
@@ -233,6 +236,19 @@ func (a *AMClient) GetCompletedTransfers() (UUIDList, error) {
 	}
 
 	return completedTransfers, nil
+}
+
+// Get Completed transfer map indexed by uuid
+func (a *AMClient) GetCompletedTransfersMap(completedTransfers UUIDList) (map[string]TransferStatus, error) {
+	transferMap := map[string]TransferStatus{}
+	for _, completedTransfer := range completedTransfers.Results {
+		xfrmd, err := a.GetTransferStatus(completedTransfer)
+		if err != nil {
+			return transferMap, err
+		}
+		transferMap[completedTransfer] = xfrmd
+	}
+	return transferMap, nil
 }
 
 // Get Transfers waiting approval

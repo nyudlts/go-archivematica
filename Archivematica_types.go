@@ -30,6 +30,24 @@ type TransferStatus struct {
 	UUID         uuid.UUID `json:"uuid"`
 }
 
+type StartTransferResponse struct {
+	Message string `json:"message"`
+	Path    string `json:"path"`
+}
+
+type ApproveTransferResponse struct {
+	Message string `json:"message"`
+	UUID    string `json:"uuid"`
+}
+
+func (s StartTransferResponse) GetUUID() (string, error) {
+	m := uuidPtn.FindString(s.Path)
+	if m == "" {
+		return "", fmt.Errorf("did not find a uuid in path")
+	}
+	return m, nil
+}
+
 type UnapprovedTransfers struct {
 	Message string               `json:"message"`
 	Results []UnapprovedTransfer `json:"Results"`
