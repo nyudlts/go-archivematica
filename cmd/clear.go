@@ -10,6 +10,7 @@ import (
 var (
 	ingests   bool
 	transfers bool
+	all       bool
 )
 
 func init() {
@@ -23,7 +24,7 @@ var clrCommand = &cobra.Command{
 	Use: "clear",
 	Run: func(cmd *cobra.Command, args []string) {
 
-		if ingests || transfers {
+		if ingests || transfers || all {
 			var err error
 			client, err = go_am.NewAMClient(config, 20)
 			if err != nil {
