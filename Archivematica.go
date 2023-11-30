@@ -174,8 +174,8 @@ func (a *AMClient) ApproveTransfer(directory string, xtype string) error {
 	defer resp.Body.Close()
 
 	// print the response body
-	b, _ := io.ReadAll(resp.Body)
-	fmt.Println(string(b))
+	//b, _ := io.ReadAll(resp.Body)
+	//fmt.Println(string(b))
 
 	return nil
 }
@@ -278,6 +278,19 @@ func (a *AMClient) GetUnapprovedTransfers() (UnapprovedTransfers, error) {
 	}
 
 	return unapprovedTransfers, nil
+}
+
+// get unapproved Transfers as map
+func (a *AMClient) GetUnapprovedTransfersMap(unapprovedTransfers UnapprovedTransfers) (map[string]TransferStatus, error) {
+	transferMap := map[string]TransferStatus{}
+	for _, unapprovedTransfer := range unapprovedTransfers.Results {
+		ts, err := a.GetTransferStatus(unapprovedTransfer.UUID.String())
+		if err != nil {
+			return transferMap, err
+		}
+		transferMap[unapprovedTransfer.UUID.String()] = ts
+	}
+	return transferMap, nil
 }
 
 // Delete a transfer

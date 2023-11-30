@@ -7,8 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var config string
-
 func init() {
 	monitorCommand.Flags().StringVar(&config, "config", "", "")
 	rootCmd.AddCommand(monitorCommand)
