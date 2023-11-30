@@ -3,7 +3,7 @@ tidy:
 
 build:
 	go mod tidy
-	go build -o build/am-services main/main.go
+	go build -o am-services main/main.go
 
 install:
 	cp am-services /usr/local/bin
