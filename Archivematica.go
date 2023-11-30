@@ -72,6 +72,20 @@ func (a *AMClient) GetCompletedIngests() (UUIDList, error) {
 	return completedIngests, nil
 }
 
+// get completed ingests as map indexed by uuid
+func (a *AMClient) GetCompletedIngestsMap(ingests UUIDList) (map[string]IngestStatus, error) {
+	completedIngests := map[string]IngestStatus{}
+	for _, completedIngest := range ingests.Results {
+		igs, err := a.GetIngestStatus(completedIngest)
+		if err != nil {
+			return completedIngests, err
+		}
+		completedIngests[completedIngest] = igs
+	}
+	return completedIngests, nil
+
+}
+
 // Get Waiting ingests
 func (a *AMClient) GetWaitingIngests() (WaitingIngests, error) {
 	waitingIngests := WaitingIngests{}

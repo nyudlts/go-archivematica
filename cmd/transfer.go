@@ -42,7 +42,7 @@ var transferCmd = &cobra.Command{
 			panic(err)
 		}
 
-		fmt.Println(uuid)
+		fmt.Println("transfer started: " + uuid)
 
 		foundUnapproved := false
 
@@ -50,7 +50,7 @@ var transferCmd = &cobra.Command{
 			foundUnapproved = findUnapprovedTransfer(uuid)
 			if !foundUnapproved {
 				fmt.Println("  * Waiting for approval process to complete")
-				time.Sleep(1 * time.Second)
+				time.Sleep(5 * time.Second)
 			}
 		}
 
@@ -70,14 +70,14 @@ var transferCmd = &cobra.Command{
 			panic(err)
 		}
 
-		fmt.Println("Transfer approved: ", approvedTransfer.UUID)
+		fmt.Println("Transfer approved:", approvedTransfer.UUID)
 
 		foundCompleted := false
 		for !foundCompleted {
 			foundCompleted = findCompletedTransfer(uuid)
 			if !foundCompleted {
 				fmt.Println("  * Waiting for transfer process to complete")
-				time.Sleep(2 * time.Second)
+				time.Sleep(5 * time.Second)
 			}
 		}
 
@@ -90,14 +90,44 @@ var transferCmd = &cobra.Command{
 
 		fmt.Println("Transfer completed: ", sipUUID)
 
+		foundIngestCompleted := false
+		for !foundIngestCompleted {
+			foundIngestCompleted = findCompletedIngest(sipUUID)
+			if !foundIngestCompleted {
+				fmt.Println("  * Waiting for ingest process to complete")
+				time.Sleep(5 * time.Second)
+			}
+		}
+
+		fmt.Println("Ingest Completed:", sipUUID)
+
 	},
+}
+
+func findCompletedIngest(sipUuid string) bool {
+	completedIngests, err := client.GetCompletedIngests()
+	if err != nil {
+		panic(err)
+	}
+
+	completedIngestsMap, err := client.GetCompletedIngestsMap(completedIngests)
+	if err != nil {
+		panic(err)
+	}
+
+	for k, _ := range completedIngestsMap {
+		if k == sipUuid {
+			return true
+		}
+	}
+
+	return false
 }
 
 func findCompletedTransfer(uuid string) bool {
 	completedTransfers, err := client.GetCompletedTransfers()
 	if err != nil {
 		panic(err)
-
 	}
 
 	completedTransfersMap, err := client.GetCompletedTransfersMap(completedTransfers)
