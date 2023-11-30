@@ -116,6 +116,32 @@ func (a *AMClient) GetWaitingIngests() (WaitingIngests, error) {
 
 }
 
+func (a *AMClient) DeleteIngest(id uuid.UUID) error {
+	endpoint := fmt.Sprintf("/api/ingest/%s/delete/", id)
+	reqUrl := fmt.Sprintf("%s%s", a.AMHost, endpoint)
+	req, err := http.NewRequest("DELETE", reqUrl, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", fmt.Sprintf("ApiKey archivematica:%s", a.AMAPIKey))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	fmt.Println("body:", string(body))
+
+	return nil
+}
+
 //* Transfer Functions *//
 
 // Start a new transfer
@@ -310,9 +336,8 @@ func (a *AMClient) GetUnapprovedTransfersMap(unapprovedTransfers UnapprovedTrans
 // Delete a transfer
 func (a *AMClient) DeleteTransfer(id uuid.UUID) error {
 
-	endpoint := fmt.Sprintf("/api/transfer/unapproved/%s", id)
+	endpoint := fmt.Sprintf("/api/transfer/%s/delete/", id)
 	reqUrl := fmt.Sprintf("%s%s", a.AMHost, endpoint)
-
 	req, err := http.NewRequest("DELETE", reqUrl, nil)
 	if err != nil {
 		return err
@@ -331,7 +356,8 @@ func (a *AMClient) DeleteTransfer(id uuid.UUID) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(body))
+	fmt.Println("body:", string(body))
+
 	return nil
 }
 
