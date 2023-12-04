@@ -2,10 +2,13 @@ package go_am
 
 import (
 	"encoding/base64"
+	"os"
+	"path/filepath"
 	"regexp"
+
+	"github.com/google/uuid"
 )
 
-var config string
 var uuidPtn = regexp.MustCompile("[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-4[a-fA-F0-9]{3}-[8|9|aA|bB][a-fA-F0-9]{3}-[a-fA-F0-9]{12}")
 
 func decodeLocationBrowser(encodedLocationBrowser *LocationBrowser) error {
@@ -53,4 +56,40 @@ func convertBase64Map(encodedMap map[string]map[string]int) (map[string]map[stri
 		decodedMap[string(decodedKey)] = v
 	}
 	return decodedMap, nil
+}
+
+func convertUUIDToAMDirectory(uid string) (string, error) {
+	uidDir := ""
+	_, err := uuid.Parse(uid)
+	if err != nil {
+		return "", err
+	}
+	uidDir = filepath.Join(uidDir, uid[0:4], uid[4:8], uid[9:13], uid[14:18], uid[19:23], uid[24:28], uid[28:32], uid[32:36])
+	return uidDir, nil
+
+}
+
+func (a *AMClient) GetAIPLocation(sipUUID string) (string, error) {
+	sipDir, err := convertUUIDToAMDirectory(sipUUID)
+	if err != nil {
+		panic(err)
+	}
+	sipDir = filepath.Join(a.StagingLoc, "AIPsStore", sipDir)
+	_, err = os.Stat(sipDir)
+	if err != nil {
+		return "", err
+	}
+
+	sipDirFiles, err := os.ReadDir(sipDir)
+	if err != nil {
+		return "", nil
+	}
+
+	aipDir := filepath.Join(sipDir, sipDirFiles[0].Name())
+	_, err = os.Stat(aipDir)
+	if err != nil {
+		return "", err
+	}
+
+	return aipDir, nil
 }

@@ -10,12 +10,13 @@ import (
 )
 
 type AMClient struct {
-	Username string
-	AMHost   string
-	AMAPIKey string
-	SSHost   string
-	SSAPIKey string
-	Client   *http.Client
+	Username   string
+	AMHost     string
+	AMAPIKey   string
+	SSHost     string
+	SSAPIKey   string
+	Client     *http.Client
+	StagingLoc string
 }
 
 func (a *AMClient) String() string {
@@ -23,11 +24,12 @@ func (a *AMClient) String() string {
 }
 
 type AMEnvironment struct {
-	AMURL    string `yaml:"am_url"`
-	SSURL    string `yaml:"ss_url"`
-	Username string `yaml:"username"`
-	AMAPIKey string `yaml:"am_api_key"`
-	SSAPIKey string `yaml:"ss_api_key"`
+	AMURL      string `yaml:"am_url"`
+	SSURL      string `yaml:"ss_url"`
+	Username   string `yaml:"username"`
+	AMAPIKey   string `yaml:"am_api_key"`
+	SSAPIKey   string `yaml:"ss_api_key"`
+	StagingLoc string `yaml:"staging_location"`
 }
 
 func NewAMClient(config string, timeout int) (*AMClient, error) {
@@ -51,5 +53,5 @@ func NewAMClient(config string, timeout int) (*AMClient, error) {
 		return nil, err
 	}
 
-	return &AMClient{Username: amEnv.Username, AMHost: amEnv.AMURL, SSHost: amEnv.SSURL, AMAPIKey: amEnv.AMAPIKey, SSAPIKey: amEnv.SSAPIKey, Client: nclient}, nil
+	return &AMClient{Username: amEnv.Username, AMHost: amEnv.AMURL, SSHost: amEnv.SSURL, AMAPIKey: amEnv.AMAPIKey, SSAPIKey: amEnv.SSAPIKey, Client: nclient, StagingLoc: amEnv.StagingLoc}, nil
 }
