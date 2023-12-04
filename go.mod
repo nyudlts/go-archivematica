@@ -1,4 +1,4 @@
-module go_am
+module github.com/nyudlts/go-archivematica
 
 go 1.21.3
 
