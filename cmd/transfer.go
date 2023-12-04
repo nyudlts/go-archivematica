@@ -135,7 +135,11 @@ func transferPackage(packageName string) {
 	}
 
 	fmt.Println("Ingest Completed:", sipUUID)
-	writer.WriteString(fmt.Sprintf("%s\t%s\n", sipUUID, packageName))
+	aipDir, err := client.GetAIPLocation(sipUUID)
+	if err != nil {
+		panic(err)
+	}
+	writer.WriteString(aipDir)
 	writer.Flush()
 }
 
