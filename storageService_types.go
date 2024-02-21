@@ -1,6 +1,43 @@
 package amatica
 
-import "github.com/google/uuid"
+import (
+	"fmt"
+	"strings"
+
+	"github.com/google/uuid"
+)
+
+type DeletionRequest struct {
+	EventReason string    `json:"event_reason"`
+	Pipeline    uuid.UUID `json:"pipeline"`
+	UserID      string    `json:"user_id"`
+	UserEmail   string    `json:"user_email"`
+}
+
+type Location struct {
+	Description  string   `json:"description"`
+	Enabled      bool     `json:"enabled"`
+	Path         string   `json:"path"`
+	Pipeline     []string `json:"pipeline"`
+	Purpose      string
+	Quota        interface{} `json:"quota"`
+	RelativePath string      `json:"relative_path"`
+	ResourceURI  string      `json:"resource_uri"`
+	Space        string      `json:"space"`
+	Used         int64       `json:"used"`
+	UUID         uuid.UUID   `json:"uuid"`
+}
+
+type Locations struct {
+	Meta    Meta       `json:"meta"`
+	Objects []Location `json:"objects"`
+}
+
+type LocationBrowser struct {
+	Directories []string `json:"directories"`
+	Entries     []string `json:"entries"`
+	Properties  map[string]map[string]int
+}
 
 type Meta struct {
 	Limit      int `json:"limit"`
@@ -8,6 +45,50 @@ type Meta struct {
 	Offset     int `json:"offset"`
 	Previous   int `json:"previous"`
 	TotalCount int `json:"total_count"`
+}
+
+type Package struct {
+	CurrentFullPath   string        `json:"current_full_path"`
+	CurrentLocation   string        `json:"current_location"`
+	CurrentPath       string        `json:"current_path"`
+	Encrypted         bool          `json:"encrypted"`
+	MiscAttributes    interface{}   `json:"misc_attributes"`
+	OriginPipeline    string        `json:"origin_pipeline"`
+	PackageType       string        `json:"package_type"`
+	Replicas          []interface{} `json:"replicas"`
+	ReplicatedPackage []interface{} `json:"replicated_Package"`
+	ResourceURI       string        `json:"resource_uri"`
+	Size              int64         `json:"size"`
+	Status            string        `json:"status"`
+	UUID              uuid.UUID     `json:"uuid"`
+}
+
+func (p Package) GetPipelineUUID() (uuid.UUID, error) {
+	urlSplit := strings.Split(p.OriginPipeline, "/")
+	pipelineUUID, err := uuid.Parse(urlSplit[4])
+	if err != nil {
+		return uuid.UUID{}, err
+	}
+
+	return pipelineUUID, nil
+
+}
+
+type Packages struct {
+	Meta    PackageMeta `json:"meta"`
+	Objects []Package   `json:"objects"`
+}
+
+type PackageMeta struct {
+	Limit      int    `json:"limit"`
+	Next       string `json:"next"`
+	Offset     int    `json:"offset"`
+	Previous   string `json:"previous"`
+	TotalCount int    `json:"total_count"`
+}
+
+func (p PackageMeta) String() string {
+	return fmt.Sprintf("Limit: %d, Next %s, Offset %d, Previous %s, TotalCount: %d", p.Limit, p.Next, p.Offset, p.Previous, p.TotalCount)
 }
 
 type Pipeline struct {
@@ -39,63 +120,3 @@ type Spaces struct {
 	Meta    Meta    `json:"meta"`
 	Objects []Space `json:"objects"`
 }
-
-type Location struct {
-	Description  string   `json:"description"`
-	Enabled      bool     `json:"enabled"`
-	Path         string   `json:"path"`
-	Pipeline     []string `json:"pipeline"`
-	Purpose      string
-	Quota        interface{} `json:"quota"`
-	RelativePath string      `json:"relative_path"`
-	ResourceURI  string      `json:"resource_uri"`
-	Space        string      `json:"space"`
-	Used         int64       `json:"used"`
-	UUID         uuid.UUID   `json:"uuid"`
-}
-
-type Locations struct {
-	Meta    Meta       `json:"meta"`
-	Objects []Location `json:"objects"`
-}
-
-type LocationBrowser struct {
-	Directories []string `json:"directories"`
-	Entries     []string `json:"entries"`
-	Properties  map[string]map[string]int
-}
-
-/*
-{
-    "directories": [
-        "RUlDQVI=",
-        "ZmFsZXNfbXNzNDIwX2VsZWN0cm9uaWMtcmVjb3Jkcy1iYXRjaC0x",
-        "ZmFsZXNfbXNzNDIwX2VsZWN0cm9uaWMtcmVjb3Jkcy1iYXRjaC0y",
-        "bnl1YXJjaGl2ZXNfcmczN181MV9lbGVjdHJvbmljLXJlY29yZHMtYmF0Y2gtMg=="
-    ],
-    "entries": [
-        "QkFWQzEwMDQwMTVfUkQzX09zY2FySS5tb3Y=",
-        "RUlDQVI=",
-        "ZmFsZXNfbXNzNDIwX2VsZWN0cm9uaWMtcmVjb3Jkcy1iYXRjaC0x",
-        "ZmFsZXNfbXNzNDIwX2VsZWN0cm9uaWMtcmVjb3Jkcy1iYXRjaC0y",
-        "bnl1YXJjaGl2ZXNfcmczN181MV9lbGVjdHJvbmljLXJlY29yZHMtYmF0Y2gtMg=="
-    ],
-    "properties": {
-        "QkFWQzEwMDQwMTVfUkQzX09zY2FySS5tb3Y=": {
-            "size": 56349350023
-        },
-        "RUlDQVI=": {
-            "object count": 1
-        },
-        "ZmFsZXNfbXNzNDIwX2VsZWN0cm9uaWMtcmVjb3Jkcy1iYXRjaC0x": {
-            "object count": 129
-        },
-        "ZmFsZXNfbXNzNDIwX2VsZWN0cm9uaWMtcmVjb3Jkcy1iYXRjaC0y": {
-            "object count": 1491
-        },
-        "bnl1YXJjaGl2ZXNfcmczN181MV9lbGVjdHJvbmljLXJlY29yZHMtYmF0Y2gtMg==": {
-            "object count": 9
-        }
-    }
-}
-*/

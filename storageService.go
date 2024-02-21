@@ -6,6 +6,9 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
+
+	"github.com/google/uuid"
 )
 
 // get a pipeline
@@ -218,6 +221,8 @@ func (a *AMClient) BrowseLocation(locationUUID string) (*LocationBrowser, error)
 		return &locationBrowser, err
 	}
 
+	fmt.Println(response)
+
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
 		return &locationBrowser, err
@@ -231,4 +236,95 @@ func (a *AMClient) BrowseLocation(locationUUID string) (*LocationBrowser, error)
 		return &locationBrowser, err
 	}
 	return &locationBrowser, nil
+}
+
+// Packages
+func (a *AMClient) GetPackage(packageUUID uuid.UUID) (*Package, error) {
+	var pack Package
+	endpoint := fmt.Sprintf("/api/v2/file/%s", packageUUID)
+	url := fmt.Sprintf("%s%s", a.SSHost, endpoint)
+	get, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.SSAPIKey)
+	get.Header.Add("Authorization", auth)
+	response, err := a.Client.Do(get)
+	if err != nil {
+		return nil, err
+	}
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := json.Unmarshal(body, &pack); err != nil {
+		return &pack, err
+	}
+
+	return &pack, nil
+
+}
+
+func (a *AMClient) GetPackages(params *string) (Packages, error) {
+	var packages Packages
+	endpoint := "/api/v2/file/"
+	if params != nil {
+		endpoint = *params
+	}
+
+	url := fmt.Sprintf("%s%s", a.SSHost, endpoint)
+	get, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return packages, err
+	}
+	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.SSAPIKey)
+	get.Header.Add("Authorization", auth)
+	response, err := a.Client.Do(get)
+	if err != nil {
+		return packages, err
+	}
+	body, err := io.ReadAll(response.Body)
+	if err != nil {
+		return packages, err
+	}
+
+	if err := json.Unmarshal(body, &packages); err != nil {
+		return packages, err
+	}
+
+	return packages, nil
+}
+
+func (a *AMClient) RequestPackageDeletion(packageUUID uuid.UUID, deletionRequest string) (string, error) {
+	//construct the endpoint
+	endpoint := fmt.Sprintf("/api/v2/file/%s/delete_aip/", packageUUID)
+	body := strings.NewReader(deletionRequest)
+
+	//construct the url
+	ss_url := fmt.Sprintf("%s%s", a.SSHost, endpoint)
+	req, err := http.NewRequest("POST", ss_url, body)
+	if err != nil {
+		return "", err
+	}
+
+	//add the headers
+	req.Header.Add("Authorization", fmt.Sprintf("Apikey %s:%s", a.Username, a.SSAPIKey))
+	req.Header.Set("Content-Type", "application/json")
+
+	fmt.Println(req)
+	//execute the post
+	resp, err := a.Client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return string(b), nil
+
 }
