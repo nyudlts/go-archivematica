@@ -266,6 +266,38 @@ func (a *AMClient) GetPackage(packageUUID uuid.UUID) (*Package, error) {
 
 }
 
+// Get all Packages
+func (a *AMClient) GetAllPackages() ([]Package, error) {
+	packs := []Package{}
+	packages, err := a.GetPackages(nil)
+	if err != nil {
+		return packs, err
+	}
+
+	for _, pack := range packages.Objects {
+		packs = append(packs, pack)
+	}
+
+	complete := false
+	for !complete {
+		packages, err = a.GetPackages(&packages.Meta.Next)
+		if err != nil {
+			return packs, err
+		}
+
+		for _, pack := range packages.Objects {
+			packs = append(packs, pack)
+		}
+
+		if packages.Meta.Next == "" {
+			complete = true
+		}
+	}
+
+	return packs, nil
+
+}
+
 // Get Packs by Type
 func (a *AMClient) GetPackageType(packType string) ([]Package, error) {
 	packs := []Package{}
