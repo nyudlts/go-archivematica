@@ -299,7 +299,7 @@ func (a *AMClient) GetAllPackages() ([]Package, error) {
 }
 
 // Get Packs by Type
-func (a *AMClient) GetPackageType(packType string) ([]Package, error) {
+func (a *AMClient) GetPackagesByType(packType string) ([]Package, error) {
 	packs := []Package{}
 
 	packages, err := a.GetPackages(nil)
@@ -335,7 +335,7 @@ func (a *AMClient) GetPackageType(packType string) ([]Package, error) {
 	return packs, nil
 }
 
-func (a *AMClient) GetPackageStatus(status string) ([]Package, error) {
+func (a *AMClient) GetPackageByStatus(status string) ([]Package, error) {
 	packs := []Package{}
 
 	packages, err := a.GetPackages(nil)
@@ -369,6 +369,42 @@ func (a *AMClient) GetPackageStatus(status string) ([]Package, error) {
 	}
 
 	return packs, nil
+}
+
+func (a *AMClient) GetPackagesByPath(path string) ([]Package, error) {
+	packs := []Package{}
+	packages, err := a.GetPackages(nil)
+	if err != nil {
+		return packs, err
+	}
+
+	for _, pack := range packages.Objects {
+		if strings.Contains(pack.CurrentPath, path) {
+			packs = append(packs, pack)
+		}
+	}
+
+	complete := false
+
+	for !complete {
+		packages, err = a.GetPackages(&packages.Meta.Next)
+		if err != nil {
+			return packs, err
+		}
+
+		for _, pack := range packages.Objects {
+			if strings.Contains(pack.CurrentPath, path) {
+				packs = append(packs, pack)
+			}
+		}
+
+		if packages.Meta.Next == "" {
+			complete = true
+		}
+	}
+
+	return packs, nil
+
 }
 
 func (a *AMClient) GetPackages(params *string) (Packages, error) {
@@ -432,4 +468,49 @@ func (a *AMClient) RequestPackageDeletion(packageUUID uuid.UUID, deletionRequest
 
 	return string(b), nil
 
+}
+
+func (a *AMClient) FilterPackages(packageType *string, packageStatus *string, packagePath *string) ([]Package, error) {
+	filteredPacks := []Package{}
+	allPacks, err := a.GetAllPackages()
+	if err != nil {
+		return filteredPacks, err
+	}
+
+	//filter by type
+	if packageType == nil {
+		filteredPacks = allPacks
+	} else {
+		for _, pack := range allPacks {
+			if pack.PackageType == *packageType {
+				filteredPacks = append(filteredPacks, pack)
+			}
+		}
+	}
+
+	//filter by status
+	filteredPacks2 := []Package{}
+	if packageStatus != nil {
+		for _, pack := range filteredPacks {
+			if pack.Status == *packageStatus {
+				filteredPacks2 = append(filteredPacks2, pack)
+			}
+		}
+	} else {
+		filteredPacks2 = filteredPacks
+	}
+
+	filteredPacks3 := []Package{}
+	//filter by path
+	if packagePath != nil {
+		for _, pack := range filteredPacks2 {
+			if strings.Contains(pack.CurrentPath, *packagePath) {
+				filteredPacks3 = append(filteredPacks3, pack)
+			}
+		}
+	} else {
+		filteredPacks3 = filteredPacks2
+	}
+
+	return filteredPacks3, nil
 }
