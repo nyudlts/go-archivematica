@@ -1,6 +1,7 @@
 package amatica
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -55,6 +56,7 @@ type Package struct {
 	MiscAttributes    interface{}   `json:"misc_attributes"`
 	OriginPipeline    string        `json:"origin_pipeline"`
 	PackageType       string        `json:"package_type"`
+	RelatedPackages   []string      `json:"related_packages"`
 	Replicas          []interface{} `json:"replicas"`
 	ReplicatedPackage []interface{} `json:"replicated_Package"`
 	ResourceURI       string        `json:"resource_uri"`
@@ -72,6 +74,14 @@ func (p Package) GetPipelineUUID() (uuid.UUID, error) {
 
 	return pipelineUUID, nil
 
+}
+
+func (p Package) MarshalPack() (string, error) {
+	packJson, err := json.Marshal(p)
+	if err != nil {
+		return "", err
+	}
+	return string(packJson), nil
 }
 
 type Packages struct {

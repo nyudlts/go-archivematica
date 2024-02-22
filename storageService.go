@@ -266,6 +266,79 @@ func (a *AMClient) GetPackage(packageUUID uuid.UUID) (*Package, error) {
 
 }
 
+// Get Packs by Type
+func (a *AMClient) GetPackageType(packType string) ([]Package, error) {
+	packs := []Package{}
+
+	packages, err := a.GetPackages(nil)
+	if err != nil {
+		return packs, err
+	}
+
+	for _, pack := range packages.Objects {
+		if pack.PackageType == packType {
+			packs = append(packs, pack)
+		}
+	}
+
+	complete := false
+
+	for !complete {
+		packages, err = a.GetPackages(&packages.Meta.Next)
+		if err != nil {
+			return packs, err
+		}
+
+		for _, pack := range packages.Objects {
+			if pack.PackageType == packType {
+				packs = append(packs, pack)
+			}
+		}
+
+		if packages.Meta.Next == "" {
+			complete = true
+		}
+	}
+
+	return packs, nil
+}
+
+func (a *AMClient) GetPackageStatus(status string) ([]Package, error) {
+	packs := []Package{}
+
+	packages, err := a.GetPackages(nil)
+	if err != nil {
+		return packs, err
+	}
+
+	for _, pack := range packages.Objects {
+		if pack.Status == status {
+			packs = append(packs, pack)
+		}
+	}
+
+	complete := false
+
+	for !complete {
+		packages, err = a.GetPackages(&packages.Meta.Next)
+		if err != nil {
+			return packs, err
+		}
+
+		for _, pack := range packages.Objects {
+			if pack.Status == status {
+				packs = append(packs, pack)
+			}
+		}
+
+		if packages.Meta.Next == "" {
+			complete = true
+		}
+	}
+
+	return packs, nil
+}
+
 func (a *AMClient) GetPackages(params *string) (Packages, error) {
 	var packages Packages
 	endpoint := "/api/v2/file/"
