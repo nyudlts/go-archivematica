@@ -17,7 +17,7 @@ type AMClient struct {
 	SSAPIKey    string
 	Client      *http.Client
 	StagingLoc  string
-	SSUserID    int
+	SSUserID    string
 	SSUserEmail string
 }
 
@@ -32,7 +32,7 @@ type AMEnvironment struct {
 	AMAPIKey    string `yaml:"am_api_key"`
 	SSAPIKey    string `yaml:"ss_api_key"`
 	StagingLoc  string `yaml:"staging_location"`
-	SSUserID    int    `yaml:"ss_user_id"`
+	SSUserID    string `yaml:"ss_user_id"`
 	SSUserEmail string `yaml:"ss_user_email"`
 }
 
