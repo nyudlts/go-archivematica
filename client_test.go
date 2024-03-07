@@ -19,6 +19,7 @@ func TestAMClient(t *testing.T) {
 			t.Error(err)
 		}
 		t.Logf("%s", amClient)
+		t.Log(amClient.AIPStoreLocation)
 
 	})
 }

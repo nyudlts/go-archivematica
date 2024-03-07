@@ -73,7 +73,11 @@ func (p Package) GetPipelineUUID() (uuid.UUID, error) {
 	}
 
 	return pipelineUUID, nil
+}
 
+func (p Package) GetPackageName() string {
+	urisplit := strings.Split(p.CurrentPath, "/")
+	return urisplit[len(urisplit)-1]
 }
 
 func (p Package) MarshalPack() (string, error) {
