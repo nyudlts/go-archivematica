@@ -14,12 +14,10 @@ func init() {
 func TestAMClient(t *testing.T) {
 	flag.Parse()
 	t.Run("Test AMClient Creation", func(t *testing.T) {
-		amClient, err := NewAMClient(config, 20)
+		_, err := NewAMClient(config, 20)
 		if err != nil {
 			t.Error(err)
 		}
-		t.Logf("%s", amClient)
-		t.Log(amClient.AIPStoreLocation)
 
 	})
 }

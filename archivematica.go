@@ -116,12 +116,12 @@ func (a *AMClient) GetWaitingIngests() (WaitingIngests, error) {
 
 }
 
-func (a *AMClient) DeleteIngest(id uuid.UUID) error {
+func (a *AMClient) DeleteIngest(id uuid.UUID) (string, error) {
 	endpoint := fmt.Sprintf("/api/ingest/%s/delete/", id)
 	reqUrl := fmt.Sprintf("%s%s", a.AMHost, endpoint)
 	req, err := http.NewRequest("DELETE", reqUrl, nil)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	req.Header.Set("Authorization", fmt.Sprintf("ApiKey archivematica:%s", a.AMAPIKey))
@@ -129,17 +129,16 @@ func (a *AMClient) DeleteIngest(id uuid.UUID) error {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		return "", err
 	}
-	fmt.Println("body:", string(body))
 
-	return nil
+	return string(body), nil
 }
 
 //* Transfer Functions *//
@@ -212,10 +211,6 @@ func (a *AMClient) ApproveTransfer(directory string, xtype string) error {
 		return err
 	}
 	defer resp.Body.Close()
-
-	// print the response body
-	//b, _ := io.ReadAll(resp.Body)
-	//fmt.Println(string(b))
 
 	return nil
 }
@@ -334,13 +329,13 @@ func (a *AMClient) GetUnapprovedTransfersMap(unapprovedTransfers UnapprovedTrans
 }
 
 // Delete a transfer
-func (a *AMClient) DeleteTransfer(id uuid.UUID) error {
+func (a *AMClient) DeleteTransfer(id uuid.UUID) (string, error) {
 
 	endpoint := fmt.Sprintf("/api/transfer/%s/delete/", id)
 	reqUrl := fmt.Sprintf("%s%s", a.AMHost, endpoint)
 	req, err := http.NewRequest("DELETE", reqUrl, nil)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	req.Header.Set("Authorization", fmt.Sprintf("ApiKey archivematica:%s", a.AMAPIKey))
@@ -348,15 +343,14 @@ func (a *AMClient) DeleteTransfer(id uuid.UUID) error {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		return "", err
 	}
-	fmt.Println("body:", string(body))
 
-	return nil
+	return string(body), nil
 }

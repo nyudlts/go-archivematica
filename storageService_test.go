@@ -11,8 +11,6 @@ func TestStorageServiceEndpoints(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	t.Log(ssClient)
-
 	var pipelineUUID string
 	t.Run("get pipelines", func(t *testing.T) {
 		pipelines, err := ssClient.GetPipelines()
@@ -27,11 +25,10 @@ func TestStorageServiceEndpoints(t *testing.T) {
 	})
 
 	t.Run("get a pipeline", func(t *testing.T) {
-		pipeline, err := ssClient.GetPipeline(pipelineUUID)
+		_, err := ssClient.GetPipeline(pipelineUUID)
 		if err != nil {
 			t.Error(err)
 		}
-		t.Logf("%v\n", pipeline)
 	})
 
 	var spaceUUID string
@@ -46,53 +43,50 @@ func TestStorageServiceEndpoints(t *testing.T) {
 			t.Error("No spaces returned")
 		}
 
-		t.Logf("%v\n", spaceUUID)
 	})
 
 	t.Run("get space", func(t *testing.T) {
-		space, err := ssClient.GetSpace(spaceUUID)
+		_, err := ssClient.GetSpace(spaceUUID)
 		if err != nil {
 			t.Error(err)
 		}
-		t.Logf("%v\n", space)
 	})
 
-	var locationUUID string
+	var locationRef Location
+
 	t.Run("get locations", func(t *testing.T) {
 		locations, err := ssClient.GetLocations()
 		if err != nil {
 			t.Error(err)
 		}
 		if len(locations.Objects) > 0 {
-			locationUUID = locations.Objects[0].UUID.String()
-			t.Log(locations.Objects[0].Description)
+			locationRef = locations.Objects[0]
 		} else {
 			t.Error("No locations returned")
 		}
 	})
+
 	t.Run("get location", func(t *testing.T) {
-		location, err := ssClient.GetLocation(locationUUID)
+		_, err := ssClient.GetLocation(locationRef.UUID.String())
 		if err != nil {
 			t.Error(err)
 		}
 
-		t.Logf("%v\n", location)
 	})
 
 	t.Run("browse a location", func(t *testing.T) {
-		locationBrowser, err := ssClient.BrowseLocation("ae15ce6f-40e7-4ed7-b8ce-11c65a7643e9")
+		_, err := ssClient.BrowseLocation(locationRef.UUID.String())
 		if err != nil {
 			t.Error(err)
 		}
-		t.Logf("%v\n", locationBrowser)
+
 	})
 
 	t.Run("get a location by name", func(t *testing.T) {
-		locationName := "staging ingest"
-		location, err := ssClient.GetLocationByName(locationName)
+		_, err := ssClient.GetLocationByName(locationRef.Description)
 		if err != nil {
 			t.Error(err)
 		}
-		t.Logf("%v\n", location)
 	})
+
 }

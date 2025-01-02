@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 
@@ -47,7 +46,7 @@ func (a *AMClient) GetPipelines() (*Pipelines, error) {
 	var pipelines Pipelines
 	endpoint := "/api/v2/pipeline?description__startswith=Archivematica"
 	url := fmt.Sprintf("%s%s", a.SSHost, endpoint)
-	log.Printf("%s", url)
+
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return &pipelines, err
@@ -220,8 +219,6 @@ func (a *AMClient) BrowseLocation(locationUUID string) (*LocationBrowser, error)
 	if err != nil {
 		return &locationBrowser, err
 	}
-
-	fmt.Println(response)
 
 	body, err := io.ReadAll(response.Body)
 	if err != nil {
@@ -452,8 +449,6 @@ func (a *AMClient) RequestPackageDeletion(packageUUID uuid.UUID, deletionRequest
 	//add the headers
 	req.Header.Add("Authorization", fmt.Sprintf("Apikey %s:%s", a.Username, a.SSAPIKey))
 	req.Header.Set("Content-Type", "application/json")
-
-	fmt.Println(req)
 	//execute the post
 	resp, err := a.Client.Do(req)
 	if err != nil {

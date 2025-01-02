@@ -88,7 +88,6 @@ func (a *AMClient) GetAIPLocation(sipUUID string) (string, error) {
 	}
 
 	aipDir := filepath.Join(sipDir, sipDirFiles[0].Name())
-	fmt.Println("AIPDIR: ", aipDir)
 	_, err = os.Stat(aipDir)
 	if err != nil {
 		return "", err
