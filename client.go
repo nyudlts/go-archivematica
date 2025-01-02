@@ -53,3 +53,7 @@ func NewAMClient(config string, timeout int) (*AMClient, error) {
 
 	return &AMClient{Username: amEnv.Username, AMHost: amEnv.AMURL, SSHost: amEnv.SSURL, AMAPIKey: amEnv.AMAPIKey, SSAPIKey: amEnv.SSAPIKey, Client: nclient}, nil
 }
+
+func (a *AMClient) GetVersion() string {
+	return version
+}
