@@ -1,9 +1,15 @@
-package go_am
+package go_archivematica
 
 import (
 	"flag"
 	"testing"
 )
+
+var config string
+
+func init() {
+	flag.StringVar(&config, "config", "", "")
+}
 
 func TestAMClient(t *testing.T) {
 	flag.Parse()
@@ -13,6 +19,7 @@ func TestAMClient(t *testing.T) {
 			t.Error(err)
 		}
 		t.Logf("%s", amClient)
+		t.Log(amClient.AIPStoreLocation)
 
 	})
 }

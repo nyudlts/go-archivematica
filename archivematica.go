@@ -1,4 +1,4 @@
-package go_am
+package go_archivematica
 
 import (
 	"encoding/base64"
@@ -72,6 +72,20 @@ func (a *AMClient) GetCompletedIngests() (UUIDList, error) {
 	return completedIngests, nil
 }
 
+// get completed ingests as map indexed by uuid
+func (a *AMClient) GetCompletedIngestsMap(ingests UUIDList) (map[string]IngestStatus, error) {
+	completedIngests := map[string]IngestStatus{}
+	for _, completedIngest := range ingests.Results {
+		igs, err := a.GetIngestStatus(completedIngest)
+		if err != nil {
+			return completedIngests, err
+		}
+		completedIngests[completedIngest] = igs
+	}
+	return completedIngests, nil
+
+}
+
 // Get Waiting ingests
 func (a *AMClient) GetWaitingIngests() (WaitingIngests, error) {
 	waitingIngests := WaitingIngests{}
@@ -100,6 +114,32 @@ func (a *AMClient) GetWaitingIngests() (WaitingIngests, error) {
 
 	return waitingIngests, nil
 
+}
+
+func (a *AMClient) DeleteIngest(id uuid.UUID) error {
+	endpoint := fmt.Sprintf("/api/ingest/%s/delete/", id)
+	reqUrl := fmt.Sprintf("%s%s", a.AMHost, endpoint)
+	req, err := http.NewRequest("DELETE", reqUrl, nil)
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", fmt.Sprintf("ApiKey archivematica:%s", a.AMAPIKey))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	fmt.Println("body:", string(body))
+
+	return nil
 }
 
 //* Transfer Functions *//
@@ -174,8 +214,8 @@ func (a *AMClient) ApproveTransfer(directory string, xtype string) error {
 	defer resp.Body.Close()
 
 	// print the response body
-	b, _ := io.ReadAll(resp.Body)
-	fmt.Println(string(b))
+	//b, _ := io.ReadAll(resp.Body)
+	//fmt.Println(string(b))
 
 	return nil
 }
@@ -280,12 +320,24 @@ func (a *AMClient) GetUnapprovedTransfers() (UnapprovedTransfers, error) {
 	return unapprovedTransfers, nil
 }
 
+// get unapproved Transfers as map
+func (a *AMClient) GetUnapprovedTransfersMap(unapprovedTransfers UnapprovedTransfers) (map[string]TransferStatus, error) {
+	transferMap := map[string]TransferStatus{}
+	for _, unapprovedTransfer := range unapprovedTransfers.Results {
+		ts, err := a.GetTransferStatus(unapprovedTransfer.UUID.String())
+		if err != nil {
+			return transferMap, err
+		}
+		transferMap[unapprovedTransfer.UUID.String()] = ts
+	}
+	return transferMap, nil
+}
+
 // Delete a transfer
 func (a *AMClient) DeleteTransfer(id uuid.UUID) error {
 
-	endpoint := fmt.Sprintf("/api/transfer/unapproved/%s", id)
+	endpoint := fmt.Sprintf("/api/transfer/%s/delete/", id)
 	reqUrl := fmt.Sprintf("%s%s", a.AMHost, endpoint)
-
 	req, err := http.NewRequest("DELETE", reqUrl, nil)
 	if err != nil {
 		return err
@@ -304,6 +356,7 @@ func (a *AMClient) DeleteTransfer(id uuid.UUID) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(body))
+	fmt.Println("body:", string(body))
+
 	return nil
 }

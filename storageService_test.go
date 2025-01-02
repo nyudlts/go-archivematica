@@ -1,4 +1,4 @@
-package go_am
+package go_archivematica
 
 import (
 	"testing"

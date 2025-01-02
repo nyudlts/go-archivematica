@@ -1,8 +1,11 @@
-package go_am
+package go_archivematica
 
 import (
 	"encoding/base64"
+	"path/filepath"
 	"regexp"
+
+	"github.com/google/uuid"
 )
 
 const version string = "0.2.0"
@@ -55,3 +58,42 @@ func convertBase64Map(encodedMap map[string]map[string]int) (map[string]map[stri
 	}
 	return decodedMap, nil
 }
+
+func ConvertUUIDToAMDirectory(uid string) (string, error) {
+	uidDir := ""
+	_, err := uuid.Parse(uid)
+	if err != nil {
+		return "", err
+	}
+	uidDir = filepath.Join(uidDir, uid[0:4], uid[4:8], uid[9:13], uid[14:18], uid[19:23], uid[24:28], uid[28:32], uid[32:36])
+	return uidDir, nil
+}
+
+/*
+func (a *AMClient) GetAIPLocation(sipUUID string) (string, error) {
+	uuidPath, err := convertUUIDToAMDirectory(sipUUID)
+	if err != nil {
+		panic(err)
+	}
+
+	sipDir := filepath.Join(a.AIPStoreLocation, uuidPath)
+	_, err = os.Stat(sipDir)
+	if err != nil {
+		return "", err
+	}
+
+	sipDirFiles, err := os.ReadDir(sipDir)
+	if err != nil {
+		return "", nil
+	}
+
+	aipDir := filepath.Join(sipDir, sipDirFiles[0].Name())
+	fmt.Println("AIPDIR: ", aipDir)
+	_, err = os.Stat(aipDir)
+	if err != nil {
+		return "", err
+	}
+
+	return aipDir, nil
+}
+*/
