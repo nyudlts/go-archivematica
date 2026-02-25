@@ -1,44 +1,44 @@
 package go_archivematica
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 	"time"
-
-	"gopkg.in/yaml.v2"
 )
 
+type AMEnvironments map[string]AMEnvironment
+
 type AMClient struct {
-	Username         string
-	AMHost           string
-	AMAPIKey         string
-	SSHost           string
-	SSAPIKey         string
-	Client           *http.Client
-	StagingLoc       string
-	SSUserID         string
-	SSUserEmail      string
-	AIPStoreLocation string
+	Client               http.Client
+	StagingLoc           string
+	AIPStoreLocation     string
+	DashboardConfig      AMConfig `json:"dashboard"`
+	StorageServiceConfig AMConfig `json:"storage_service"`
 }
 
-func (a *AMClient) String() string {
-	return fmt.Sprintf("\nUsername\t%s\nAMHost\t\t%s\nSSHost\t\t%s", a.Username, a.AMHost, a.SSHost)
+type AMConfig struct {
+	URL       string `json:"url"`
+	Key       string `json:"api_key"`
+	UserID    int    `json:"user_id"`
+	UserEmail string `json:"user_email"`
+	Username  string `json:"username"`
+}
+
+type StorageServiceConfig struct {
+	URL string `json:"url"`
 }
 
 type AMEnvironment struct {
-	AMURL            string `yaml:"am_url"`
-	SSURL            string `yaml:"ss_url"`
-	Username         string `yaml:"username"`
-	AMAPIKey         string `yaml:"am_api_key"`
-	SSAPIKey         string `yaml:"ss_api_key"`
-	StagingLoc       string `yaml:"staging_location"`
-	SSUserID         string `yaml:"ss_user_id"`
-	SSUserEmail      string `yaml:"ss_user_email"`
-	AIPStoreLocation string `yaml:"aip_store_location"`
+	StagingLoc       string   `json:"staging_location"`
+	AIPStoreLocation string   `json:"aipsstore_location"`
+	Dashboard        AMConfig `json:"dashboard"`
+	StorageService   AMConfig `json:"storage_service"`
 }
 
-func NewAMClient(config string, timeout int) (*AMClient, error) {
+func NewAMClient(config string, environment string, timeout int) (*AMClient, error) {
+
 	transport := &http.Transport{
 		MaxIdleConns:       10,
 		IdleConnTimeout:    time.Duration(timeout) * time.Second,
@@ -54,25 +54,26 @@ func NewAMClient(config string, timeout int) (*AMClient, error) {
 		return nil, err
 	}
 
-	var amEnv AMEnvironment
-	if err := yaml.Unmarshal(configBytes, &amEnv); err != nil {
+	var amEnvs AMEnvironments
+	if err := json.Unmarshal(configBytes, &amEnvs); err != nil {
+		fmt.Println("Error parsing config file:", err)
 		return nil, err
 	}
 
-	return &AMClient{
-		Username:         amEnv.Username,
-		AMHost:           amEnv.AMURL,
-		SSHost:           amEnv.SSURL,
-		AMAPIKey:         amEnv.AMAPIKey,
-		SSAPIKey:         amEnv.SSAPIKey,
-		Client:           nclient,
-		StagingLoc:       amEnv.StagingLoc,
-		SSUserID:         amEnv.SSUserID,
-		SSUserEmail:      amEnv.SSUserEmail,
-		AIPStoreLocation: amEnv.AIPStoreLocation,
-	}, nil
-}
+	fmt.Println(amEnvs)
 
-func (a *AMClient) GetVersion() string {
-	return version
+	for envName, env := range amEnvs {
+		if envName == environment {
+			return &AMClient{
+				Client:               *nclient,
+				StagingLoc:           env.StagingLoc,
+				AIPStoreLocation:     env.AIPStoreLocation,
+				DashboardConfig:      env.Dashboard,
+				StorageServiceConfig: env.StorageService,
+			}, nil
+		}
+	}
+
+	return nil, fmt.Errorf("environment '%s' not found in config", environment)
+
 }

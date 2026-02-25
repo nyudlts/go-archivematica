@@ -1,0 +1,28 @@
+{
+  "806": {
+    "staging_location": "X:\\806",
+    "aipsstore_location": "X:\\AIPsStore",
+    "dashboard": {
+      "url": "http://172.22.91.59",
+      "api_key": "0ae2ba04d5952154e2cd7d113e1875564718cb3a",
+      "user_id": 1,
+      "user_email": "don.mennerich@nyu.edu",
+      "username": "archivematica"
+    },
+    "storage_service": {
+      "url": "http://172.22.91.59:8000",
+      "api_key": "d412a3b74da490c44ee6212d2e65069710d5dabc",
+      "user_id": 1,
+      "user_email": "don.mennerich@nyu.edu",
+      "username": "archivematica"
+    }
+  },
+  "dev": {
+    "staging_location": "X:\\dev",
+    "aipsstore_location": "X:\\AIPsStore"
+  },
+  "test": {
+    "staging_location": "X:\\test",
+    "aipsstore_location": "X:\\AIPsStore"
+  }
+}

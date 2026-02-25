@@ -1,15 +1,10 @@
 package go_archivematica
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
-	"strings"
-
-	"github.com/google/uuid"
 )
 
 //* Ingest Functions *//
@@ -18,12 +13,12 @@ import (
 func (a *AMClient) GetIngestStatus(id string) (IngestStatus, error) {
 	ingestStatus := IngestStatus{}
 	endpoint := fmt.Sprintf("/api/ingest/status/%s", id)
-	url := fmt.Sprintf("%s%s", a.AMHost, endpoint)
+	url := fmt.Sprintf("%s%s", a.DashboardConfig.URL, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return ingestStatus, err
 	}
-	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.AMAPIKey)
+	auth := fmt.Sprintf("Apikey %s:%s", a.DashboardConfig.Username, a.DashboardConfig.Key)
 	get.Header.Add("Authorization", auth)
 
 	response, err := a.Client.Do(get)
@@ -47,12 +42,12 @@ func (a *AMClient) GetIngestStatus(id string) (IngestStatus, error) {
 func (a *AMClient) GetCompletedIngests() (UUIDList, error) {
 	completedIngests := UUIDList{}
 	endpoint := "/api/ingest/completed"
-	url := fmt.Sprintf("%s%s", a.AMHost, endpoint)
+	url := fmt.Sprintf("%s%s", a.DashboardConfig.URL, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return completedIngests, err
 	}
-	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.AMAPIKey)
+	auth := fmt.Sprintf("Apikey %s:%s", a.DashboardConfig.Username, a.DashboardConfig.Key)
 	get.Header.Add("Authorization", auth)
 
 	response, err := a.Client.Do(get)
@@ -72,6 +67,8 @@ func (a *AMClient) GetCompletedIngests() (UUIDList, error) {
 	return completedIngests, nil
 }
 
+/*
+
 // get completed ingests as map indexed by uuid
 func (a *AMClient) GetCompletedIngestsMap(ingests UUIDList) (map[string]IngestStatus, error) {
 	completedIngests := map[string]IngestStatus{}
@@ -90,12 +87,12 @@ func (a *AMClient) GetCompletedIngestsMap(ingests UUIDList) (map[string]IngestSt
 func (a *AMClient) GetWaitingIngests() (WaitingIngests, error) {
 	waitingIngests := WaitingIngests{}
 	endpoint := "/api/ingest/waiting"
-	url := fmt.Sprintf("%s%s", a.AMHost, endpoint)
+	url := fmt.Sprintf("%s%s", a.DashboardConfig.URL, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return waitingIngests, err
 	}
-	auth := fmt.Sprintf("Apikey %s:%s", a.Username, a.AMAPIKey)
+	auth := fmt.Sprintf("Apikey %s:%s", a.DashboardConfig.Username, a.DashboardConfig.Key)
 	get.Header.Add("Authorization", auth)
 
 	response, err := a.Client.Do(get)
@@ -115,6 +112,7 @@ func (a *AMClient) GetWaitingIngests() (WaitingIngests, error) {
 	return waitingIngests, nil
 
 }
+
 
 func (a *AMClient) DeleteIngest(id uuid.UUID) (string, error) {
 	endpoint := fmt.Sprintf("/api/ingest/%s/delete/", id)
@@ -141,8 +139,11 @@ func (a *AMClient) DeleteIngest(id uuid.UUID) (string, error) {
 	return string(body), nil
 }
 
+*/
+
 //* Transfer Functions *//
 
+/*
 // Start a new transfer
 func (a *AMClient) StartTransfer(location uuid.UUID, path string) (StartTransferResponse, error) {
 
@@ -354,3 +355,4 @@ func (a *AMClient) DeleteTransfer(id uuid.UUID) (string, error) {
 
 	return string(body), nil
 }
+*/
