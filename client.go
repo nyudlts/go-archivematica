@@ -60,8 +60,6 @@ func NewAMClient(config string, environment string, timeout int) (*AMClient, err
 		return nil, err
 	}
 
-	fmt.Println(amEnvs)
-
 	for envName, env := range amEnvs {
 		if envName == environment {
 			return &AMClient{
@@ -76,4 +74,8 @@ func NewAMClient(config string, environment string, timeout int) (*AMClient, err
 
 	return nil, fmt.Errorf("environment '%s' not found in config", environment)
 
+}
+
+func (a *AMClient) GetStorageServiceAuth() string {
+	return fmt.Sprintf("Apikey %s:%s", a.StorageServiceConfig.Username, a.StorageServiceConfig.Key)
 }

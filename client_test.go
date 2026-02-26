@@ -2,7 +2,6 @@ package go_archivematica
 
 import (
 	"flag"
-	"fmt"
 	"testing"
 )
 
@@ -25,8 +24,6 @@ func TestAMClient(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-
-		fmt.Println(client)
 
 	})
 }
