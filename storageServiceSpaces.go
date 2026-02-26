@@ -75,7 +75,7 @@ func (a *AMClient) GetSpace(spaceUUID string) (*Space, error) {
 	return &space, nil
 }
 
-func (a *AMClient) BrowseSpace(spaceUUID string) (*SpaceBrowser, error) {
+func (a *AMClient) BrowseSpace(spaceUUID string) (*Browser, error) {
 	endpoint := fmt.Sprintf("/api/v2/space/%s/browse/", spaceUUID)
 	url := fmt.Sprintf("%s%s", a.StorageServiceConfig.URL, endpoint)
 	get, err := http.NewRequest("GET", url, nil)
@@ -101,7 +101,7 @@ func (a *AMClient) BrowseSpace(spaceUUID string) (*SpaceBrowser, error) {
 	}
 	defer response.Body.Close()
 
-	spaceBrowser := SpaceBrowser{}
+	spaceBrowser := Browser{}
 	if err := json.Unmarshal(body, &spaceBrowser); err != nil {
 		return nil, err
 	}

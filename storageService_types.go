@@ -195,7 +195,7 @@ func (s Spaces) String() string {
 	return fmt.Sprintf("Meta:\n%s\nObjects:\n%s", s.Meta, objects)
 }
 
-type SpaceBrowser struct {
+type Browser struct {
 	Directories []string            `json:"directories"`
 	Entries     []string            `json:"entries"`
 	Properties  map[string]Property `json:"properties"`
@@ -229,19 +229,19 @@ func (f *FlexibleValue) UnmarshalJSON(data []byte) error {
 	return fmt.Errorf("FlexibleValue: unsupported type: %s", string(data))
 }
 
-func (s SpaceBrowser) String() string {
+func (b Browser) String() string {
 	directories := ""
-	for _, directory := range s.Directories {
+	for _, directory := range b.Directories {
 		directories += fmt.Sprintf("  %s\n", directory)
 	}
 
 	entries := ""
-	for _, entry := range s.Entries {
+	for _, entry := range b.Entries {
 		entries += fmt.Sprintf("  %s\n", entry)
 	}
 
 	properties := ""
-	for key, value := range s.Properties {
+	for key, value := range b.Properties {
 		properties += fmt.Sprintf("  %s:\n", key)
 		if value.ObjectCount.IntValue != nil {
 			properties += fmt.Sprintf("    ObjectCount: %d\n", *value.ObjectCount.IntValue)

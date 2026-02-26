@@ -22,3 +22,15 @@ func convertBase64Slice(encodedStrings []string) ([]string, error) {
 
 	return decodedStrings, nil
 }
+
+func convertBase64Map(encodedMap map[string]Property) (map[string]Property, error) {
+	var decodedMap = make(map[string]Property)
+	for k, v := range encodedMap {
+		decodedKey, err := base64.StdEncoding.DecodeString(k)
+		if err != nil {
+			return decodedMap, err
+		}
+		decodedMap[string(decodedKey)] = v
+	}
+	return decodedMap, nil
+}

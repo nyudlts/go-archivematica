@@ -84,7 +84,6 @@ func (a *AMClient) CreatePipeline(createPipelineRequest CreatePipelineRequest) e
 
 	endpoint := "/api/v2/pipeline/"
 	url := fmt.Sprintf("%s%s", a.StorageServiceConfig.URL, endpoint)
-	fmt.Println(url)
 
 	createPipelineRequest.UUID = uuid.New().String()
 	createPipelineRequest.APIKey = a.StorageServiceConfig.Key
